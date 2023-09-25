@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audio Player</title>
+    <style>
+        /* Center all elements on the page */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        img {
+            cursor: pointer;
+        }
+
+        /* Center the buttons horizontally */
+        div {
+            display: flex;
+            flex-direction: row;
+        }
+
+        /* Add some spacing between buttons */
+        button {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <img id="thumbnail" src="" alt="Thumbnail">
+    <audio id="audioPlayer" controls>
+        Your browser does not support the audio element.
+    </audio>
+    <div>
+        <button id="btnMinus5">-5 Min</button>
+        <button id="btnMinus1">-1 Min</button>
+        <button id="btnMinus30">-30 Sec</button>
+        <button id="btnPlus30">+30 Sec</button>
+        <button id="btnPlus1">+1 Min</button>
+        <button id="btnPlus5">+5 Min</button>
+    </div>
+
+    <script>
+        const audioPlayer = document.getElementById('audioPlayer');
+        const thumbnail = document.getElementById('thumbnail');
+        const btnMinus5 = document.getElementById('btnMinus5');
+        const btnMinus1 = document.getElementById('btnMinus1');
+        const btnMinus30 = document.getElementById('btnMinus30');
+        const btnPlus30 = document.getElementById('btnPlus30');
+        const btnPlus1 = document.getElementById('btnPlus1');
+        const btnPlus5 = document.getElementById('btnPlus5');
+
+        // Function to set a cookie with the current audio position for a specific audio file
+        function setAudioPositionCookie(audioFile, position) {
+            document.cookie = `${audioFile}_audioPosition=${position}`;
+        }
+
+        // Function to read the audio position from the cookie for a specific audio file and set it
+        function setAudioPositionFromCookie(audioFile) {
+            const cookies = document.cookie.split('; ');
+            for (const cookie of cookies) {
+                const [name, value] = cookie.split('=');
+                if (name === `${audioFile}_audioPosition`) {
+                    const position = parseFloat(value);
+                    if (!isNaN(position)) {
+                        audioPlayer.currentTime = position;
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Function to get the "play" GET variable from the URL
+        function getPlayVariable() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('play');
+        }
+
+        // Toggle play and pause when clicking on the thumbnail
+        thumbnail.addEventListener('click', function () {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
+        });
+
+        // Add event listeners to the buttons for adjusting audio position
+        btnMinus5.addEventListener('click', function () {
+            audioPlayer.currentTime -= 300; // 5 minutes in seconds
+            setAudioPositionCookie(getPlayVariable(), audioPlayer.currentTime);
+        });
+
+        btnMinus1.addEventListener('click', function () {
+            audioPlayer.currentTime -= 60; // 1 minute in seconds
+            setAudioPositionCookie(getPlayVariable(), audioPlayer.currentTime);
+        });
+
+        btnMinus30.addEventListener('click', function () {
+            audioPlayer.currentTime -= 30; // 30 seconds
+            setAudioPositionCookie(getPlayVariable(), audioPlayer.currentTime);
+        });
+
+        btnPlus30.addEventListener('click', function () {
+            audioPlayer.currentTime += 30; // 30 seconds
+            setAudioPositionCookie(getPlayVariable(), audioPlayer.currentTime);
+        });
+
+        btnPlus1.addEventListener('click', function () {
+            audioPlayer.currentTime += 60; // 1 minute in seconds
+            setAudioPositionCookie(getPlayVariable(), audioPlayer.currentTime);
+        });
+
+        btnPlus5.addEventListener('click', function () {
+            audioPlayer.currentTime += 300; // 5 minutes in seconds
+            setAudioPositionCookie(getPlayVariable(), audioPlayer.currentTime);
+        });
+
+        // Set the src of audioPlayer and thumbnail based on the "play" GET variable
+        const bookname = getPlayVariable();
+        if (bookname) {
+            audioPlayer.src = `mp3/${bookname}.mp3`;
+            thumbnail.src = `/thumb/${bookname}.jpg`;
+
+            // Set the width of the thumbnail to match the width of the audioPlayer
+            thumbnail.style.width = audioPlayer.clientWidth + 'px';
+            thumbnail.style.display = 'block'; // Display the thumbnail image
+
+            // Set the audio position for this audio file from the cookie
+            setAudioPositionFromCookie(bookname);
+
+            // Set the title of the page to the name of the book
+            document.title = bookname;
+        }
+
+        // Update the cookie for the current book every 5 seconds
+        setInterval(() => {
+            const currentPosition = audioPlayer.currentTime;
+            setAudioPositionCookie(getPlayVariable(), currentPosition);
+        }, 5000);
+    </script>
+</body>
+</html>
