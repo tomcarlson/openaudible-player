@@ -6,5 +6,6 @@ This page expects
 *  your thumbnail files to be in the form bookname.jpg in the thumb directory
 These are where openaudible puts them when you create a webpage.
 
-To use this player, call it with the booknake
+To use this player, call it with the bookname
+
      player.html?play=bookname
