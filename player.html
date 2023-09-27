@@ -27,6 +27,11 @@
         button {
             margin: 5px;
         }
+
+        /* Style for the slider */
+        input[type="range"] {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -34,6 +39,7 @@
     <audio id="audioPlayer" controls>
         Your browser does not support the audio element.
     </audio>
+    <input type="range" id="audioSlider" value="0" min="0" max="1">
     <div>
         <button id="btnMinus5">-5 Min</button>
         <button id="btnMinus1">-1 Min</button>
@@ -46,12 +52,14 @@
     <script>
         const audioPlayer = document.getElementById('audioPlayer');
         const thumbnail = document.getElementById('thumbnail');
+        const audioSlider = document.getElementById('audioSlider');
         const btnMinus5 = document.getElementById('btnMinus5');
         const btnMinus1 = document.getElementById('btnMinus1');
         const btnMinus30 = document.getElementById('btnMinus30');
         const btnPlus30 = document.getElementById('btnPlus30');
         const btnPlus1 = document.getElementById('btnPlus1');
         const btnPlus5 = document.getElementById('btnPlus5');
+        let audioLength = 0; // Variable to store audio length
 
         // Function to set a cookie with the current audio position for a specific audio file
         function setAudioPositionCookie(audioFile, position) {
@@ -67,6 +75,7 @@
                     const position = parseFloat(value);
                     if (!isNaN(position)) {
                         audioPlayer.currentTime = position;
+                        audioSlider.value = position; // Update slider position
                     }
                     break;
                 }
@@ -77,6 +86,13 @@
         function getPlayVariable() {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('play');
+        }
+
+        // Function to update the slider position and set the cookie
+        function updateSliderPosition() {
+            const currentPosition = audioPlayer.currentTime;
+            audioSlider.value = currentPosition;
+            setAudioPositionCookie(getPlayVariable(), currentPosition);
         }
 
         // Toggle play and pause when clicking on the thumbnail
@@ -91,32 +107,32 @@
         // Add event listeners to the buttons for adjusting audio position
         btnMinus5.addEventListener('click', function () {
             audioPlayer.currentTime -= 300; // 5 minutes in seconds
-            setAudioPositionCookie(getPlayVariable(), audioPlayer.currentTime);
+            updateSliderPosition();
         });
 
         btnMinus1.addEventListener('click', function () {
             audioPlayer.currentTime -= 60; // 1 minute in seconds
-            setAudioPositionCookie(getPlayVariable(), audioPlayer.currentTime);
+            updateSliderPosition();
         });
 
         btnMinus30.addEventListener('click', function () {
             audioPlayer.currentTime -= 30; // 30 seconds
-            setAudioPositionCookie(getPlayVariable(), audioPlayer.currentTime);
+            updateSliderPosition();
         });
 
         btnPlus30.addEventListener('click', function () {
             audioPlayer.currentTime += 30; // 30 seconds
-            setAudioPositionCookie(getPlayVariable(), audioPlayer.currentTime);
+            updateSliderPosition();
         });
 
         btnPlus1.addEventListener('click', function () {
             audioPlayer.currentTime += 60; // 1 minute in seconds
-            setAudioPositionCookie(getPlayVariable(), audioPlayer.currentTime);
+            updateSliderPosition();
         });
 
         btnPlus5.addEventListener('click', function () {
             audioPlayer.currentTime += 300; // 5 minutes in seconds
-            setAudioPositionCookie(getPlayVariable(), audioPlayer.currentTime);
+            updateSliderPosition();
         });
 
         // Set the src of audioPlayer and thumbnail based on the "play" GET variable
@@ -136,11 +152,25 @@
             document.title = bookname;
         }
 
-        // Update the cookie for the current book every 5 seconds
-        setInterval(() => {
-            const currentPosition = audioPlayer.currentTime;
-            setAudioPositionCookie(getPlayVariable(), currentPosition);
-        }, 5000);
+        // Get and set the audio length when the metadata is loaded
+        audioPlayer.addEventListener('loadedmetadata', function () {
+            audioLength = audioPlayer.duration;
+            audioSlider.max = audioLength;
+            // Set the width of the slider to match the width of audioPlayer
+            audioSlider.style.width = audioPlayer.clientWidth + 'px';
+            // Update the slider position when audio length changes
+            updateSliderPosition();
+        });
+
+        // Update the slider position every 5 seconds when the cookie is set
+        setInterval(updateSliderPosition, 5000);
+
+        // Update the audio position when the slider is changed by the user
+        audioSlider.addEventListener('input', function () {
+            const newPosition = parseFloat(audioSlider.value);
+            audioPlayer.currentTime = newPosition;
+            updateSliderPosition();
+        });
     </script>
 </body>
 </html>
