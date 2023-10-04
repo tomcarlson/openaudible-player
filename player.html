@@ -63,7 +63,9 @@
 
         // Function to set a cookie with the current audio position for a specific audio file
         function setAudioPositionCookie(audioFile, position) {
-            document.cookie = `${audioFile}_audioPosition=${position}`;
+            const expirationDate = new Date();
+            expirationDate.setFullYear(expirationDate.getFullYear() + 10); // Expire in 10 years
+            document.cookie = `${audioFile}_audioPosition=${position}; expires=${expirationDate.toUTCString()}`;
         }
 
         // Function to read the audio position from the cookie for a specific audio file and set it
