@@ -148,6 +148,9 @@ function showBook(book) {
 
     const image = bookImage(book, true);
     $("#detail_image").html(image);
+    $("#detail_image").wrap($('<a>',{
+      href: 'player.html?play=' + fixedEncodeURIComponent(book.filename)
+    }));
 
     $('#title').text(asString(book.title));
     $('#narrated_by').html(narratorLink(book));
