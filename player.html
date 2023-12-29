@@ -112,7 +112,7 @@
         const bookname = getPlayVariable();
         if (bookname) {
             audioPlayer.src = `mp3/${bookname}.mp3`;
-            thumbnail.src = `/thumb/${bookname}.jpg`;
+            thumbnail.src = `thumb/${bookname}.jpg`;
 
             // Set the width of the thumbnail to match the width of the audioPlayer
             thumbnail.style.width = audioPlayer.clientWidth + 'px';
