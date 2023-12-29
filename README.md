@@ -16,4 +16,9 @@ To use this player, call it with the bookname
 
      player.html?play=bookname
 
+To do this, edit the openaudible.js file that openaudible creates for you.  (or use the one included here)
+
+     // var link = "<a href=\"" + file + "\" download>" + img + "</a>";
+     var link = "<a href=player.html?play=" + fixedEncodeURIComponent(book.filename) + ">" + img + "</a>";
+     
 ![player.html](player.html.jpg)
